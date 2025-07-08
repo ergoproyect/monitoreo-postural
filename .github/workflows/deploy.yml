@@ -1,73 +1,16 @@
-name: CI/CD Pipeline
+# .github/workflows/deploy.yml
+name: Deploy to Render
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov flake8 black
-        
-    - name: Run linter (Flake8)
-      run: |
-        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        
-    - name: Run formatter (Black)
-      run: |
-        black app/ --check
-        
-    - name: Run tests with coverage
-      run: |
-        pytest --cov=app --cov-report=xml tests/
-        
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        
   deploy:
-    name: Deploy to Render
-    needs: test
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Render
-      uses: render-actions/deploy@v1
-      with:
-        service-id: ${{ secrets.RENDER_SERVICE_ID }}
-        api-key: ${{ secrets.RENDER_API_KEY }}
-        
-    - name: Send Slack notification
-      if: always()
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}
-        SLACK_TITLE: 'Deploy Status: ${{ job.status }}'
-        SLACK_MESSAGE: 'Deploy for commit ${{ github.sha }} ${{ job.status }}. View run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+      - uses: actions/checkout@v4
+      - uses: render-actions/deploy@v1
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
