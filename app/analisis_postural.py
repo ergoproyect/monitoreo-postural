@@ -252,6 +252,31 @@ while True:
             print("⚠️ Persona no detectada. Verifique posición frente al Kinect")
 
         contador = (contador + 1) % NUMERO_IMAGENES
+        # Enviar datos a la API
+        try:
+            import requests
+            api_url = "http://localhost:5000/api/posture"
+            payload = {
+                "head_angle": angulo_cabeza,
+                "head_status": cabeza_txt,
+                "head_code": cabeza_cod,
+                "shoulders_angle": angulo_hombros,
+                "shoulders_status": hombros_txt,
+                "shoulders_code": hombros_cod,
+                "arms_angle": angulo_antebrazos,
+                "arms_status": antebrazos_txt,
+                "arms_code": antebrazos_cod,
+                "back_angle": angulo_espalda,
+                "back_status": espalda_txt,
+                "back_code": espalda_cod,
+                "category": categoria,
+                "recommendation": recomendacion
+            }
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post(api_url, json=payload, headers=headers)
+        except Exception as e:
+            print(f"⚠️ Error al enviar datos a la API: {e}")
+        
         time.sleep(INTERVALO_SEGUNDOS)
 
     except KeyboardInterrupt:
