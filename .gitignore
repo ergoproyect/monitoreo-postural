@@ -1,0 +1,22 @@
+# Entornos virtuales
+venv/
+ENV/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de entorno
+.env
+.venv
+env/
+venv/
+
+# Archivos de desarrollo
+*.swp
+.DS_Store
+
+# Archivos generados por el sistema
+capturas/
+*.csv
